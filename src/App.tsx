@@ -40,8 +40,7 @@ export default function App() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [nominees, setNominees] = useState<Nominee[]>([]);
-  const [userEmail, setUserEmail] = useState('');
-  const [isEmailSet, setIsEmailSet] = useState(false);
+  const [voterId, setVoterId] = useState('');
   const [view, setView] = useState<'vote' | 'results' | 'admin'>('vote');
   const [results, setResults] = useState<Result[]>([]);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -115,11 +114,15 @@ export default function App() {
 
   useEffect(() => {
     fetchCategories();
-    const savedEmail = localStorage.getItem('voter_email');
-    if (savedEmail) {
-      setUserEmail(savedEmail);
-      setIsEmailSet(true);
+    
+    // Generate or retrieve anonymous voter ID
+    let id = localStorage.getItem('voter_id');
+    if (!id) {
+      id = 'voter_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('voter_id', id);
     }
+    setVoterId(id);
+
     const savedToken = localStorage.getItem('admin_token');
     if (savedToken) {
       setAdminToken(savedToken);
@@ -328,14 +331,6 @@ export default function App() {
     }
   };
 
-  const handleSetEmail = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (userEmail.trim()) {
-      localStorage.setItem('voter_email', userEmail);
-      setIsEmailSet(true);
-    }
-  };
-
   const handleVote = async (nomineeId: number) => {
     if (!selectedCategory) return;
 
@@ -344,7 +339,7 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userEmail,
+          userEmail: voterId,
           categoryId: selectedCategory.id,
           nomineeId
         })
@@ -364,57 +359,6 @@ export default function App() {
       setMessage({ type: 'error', text: 'Network error' });
     }
   };
-
-  if (!isEmailSet) {
-    return (
-      <div className="min-h-screen bg-premium-black text-white flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gold/20 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold/20 blur-[120px] rounded-full" />
-        </div>
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md glass p-8 sm:p-10 rounded-[2rem] shadow-2xl relative z-10"
-        >
-          <div className="flex justify-center mb-8">
-            <div className="w-24 h-24 gold-gradient rounded-full flex items-center justify-center shadow-2xl shadow-gold/40 animate-pulse">
-              <span className="text-premium-black font-black text-2xl tracking-tighter">PLIT</span>
-            </div>
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-bold text-center mb-2 serif italic gold-text drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]">DZIRE 2026</h1>
-          <p className="text-zinc-400 text-center mb-10 font-light tracking-wide">Enter your credentials to join the prestige.</p>
-          
-          <form onSubmit={handleSetEmail} className="space-y-6">
-            <div>
-              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-gold mb-3">Email Address</label>
-              <input 
-                type="email" 
-                required
-                value={userEmail}
-                onChange={(e) => setUserEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:ring-1 focus:ring-gold/50 transition-all text-sm placeholder:text-zinc-600"
-                placeholder="your@college.edu"
-              />
-            </div>
-            <button 
-              type="submit"
-              className="w-full gold-gradient text-premium-black font-bold py-4 rounded-2xl transition-all transform active:scale-[0.98] shadow-lg shadow-gold/10 hover:shadow-gold/20 uppercase tracking-widest text-xs"
-            >
-              Start Voting
-            </button>
-          </form>
-          <button 
-            onClick={() => setView('admin')}
-            className="w-full mt-6 text-zinc-500 hover:text-gold text-[10px] uppercase tracking-widest transition-colors font-bold"
-          >
-            Admin Access
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-premium-black text-white font-sans selection:bg-gold selection:text-premium-black">
