@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Vote, Trophy, User, CheckCircle2, AlertCircle, ChevronRight, BarChart3, Settings, LogOut, Plus, Trash2, X, Upload, Image as ImageIcon, Loader2, Lock, Unlock, ShieldCheck, Power } from 'lucide-react';
+import { Vote, Trophy, User, CheckCircle2, AlertCircle, ChevronRight, BarChart3, Settings, LogOut, Plus, Trash2, X, Upload, Image as ImageIcon, Loader2, Lock, Unlock, ShieldCheck, Power, Crown } from 'lucide-react';
 
 interface Category {
   id: number;
@@ -367,7 +367,11 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-5">
             <div className="w-12 h-12 sm:w-14 sm:h-14 gold-gradient rounded-xl flex items-center justify-center shadow-xl shadow-gold/20">
-              <span className="text-premium-black font-black text-sm sm:text-base tracking-tighter">PLIT</span>
+              <div className="flex items-center text-premium-black font-black text-sm sm:text-base tracking-tighter">
+                <span>PL</span>
+                <Crown className="w-4 h-4 sm:w-5 sm:h-5 mx-[-1px] fill-current" />
+                <span>T</span>
+              </div>
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight serif italic gold-text drop-shadow-sm">DZIRE <span className="text-white">2026</span></h1>
